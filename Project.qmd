@@ -1,0 +1,21 @@
+---
+title: "INFO634 Group Project"
+author: "Group # 5"
+format: docx
+editor: visual
+---
+
+```{r}
+#| echo: false 
+# Load library
+library(ggplot2)
+library(dplyr)
+library(lubridate)
+
+```
+
+```{r}
+#| echo: false 
+# Load dataset
+visitor_data<-read.csv('VisitorArrivals 28Jul2024.csv')
+```
