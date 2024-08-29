@@ -19,3 +19,7 @@ library(lubridate)
 # Load dataset
 visitor_data<-read.csv('VisitorArrivals 28Jul2024.csv')
 ```
+
+# Project Goal
+
+bla-bla-bla
