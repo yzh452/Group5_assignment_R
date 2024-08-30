@@ -1,17 +1,17 @@
-# 加载必要的R包
+# load packages
 library(ggplot2)
 library(dplyr)
 library(lubridate)
 
-# 读取数据
+# read csv file
 visitor_data<-read.csv('VisitorArrivals 28Jul2024.csv')
 
-# 查看数据结构
+# check df structure
 str(visitor_data)
 
 
 
-# 数据清理：去除包含 "Total" 的行（如果有）
+# Data Cleaning: Remove rows containing "Total" 
 visitor_data_clean <- subset(visitor_data, 
                              Country_of_residence != "Total" & 
                                NZ_port != "Total" & 
@@ -20,10 +20,10 @@ visitor_data_clean <- subset(visitor_data,
                              select = c(1, 7:11))
 
 
-# 确保日期列格式正确
+# formatting data column
 visitor_data_clean$Week_ended <- as.Date(visitor_data_clean$Week_ended, format="%Y-%m-%d")
 
-# 提取年份和月份# 提取年份和月份NULL
+# extract year & month
 visitor_data_clean$Year <- year(visitor_data_clean$Week_ended)
 visitor_data_clean$Month <- month(visitor_data_clean$Week_ended, label = TRUE)
 
@@ -44,10 +44,10 @@ monthly_visitors <- visitor_data_clean %>%
   group_by(Year, Month) %>%
   summarize(total_visitors = sum(Count))
 
-# 使用 paste() 创建 Month-Year 标签
+# create column for Month_Year lables
 monthly_visitors$Month_Year <- factor(paste(monthly_visitors$Year, monthly_visitors$Month, sep = "-"))
 
-# 绘制图表
+# plotting
 ggplot(monthly_visitors, aes(x = Month_Year, y = total_visitors)) +
   geom_line(group = 1) +
   labs(title = "Monthly Visitor Numbers (May 2022 - June 2024)",
@@ -55,13 +55,13 @@ ggplot(monthly_visitors, aes(x = Month_Year, y = total_visitors)) +
        y = "Total Visitors") +
   theme(axis.text.x = element_text(angle = 90, hjust = 1))
 
-# 按国家汇总游客数量
+# summarise the number of tourists by country
 country_visitors <- visitor_data_clean %>%
   group_by(Country_of_residence) %>%
   summarize(total_visitors = sum(Count)) %>%
   arrange(desc(total_visitors))
 
-# 绘制各国游客数量柱状图
+# plot bar chart for tourist by country
 ggplot(country_visitors, aes(x = reorder(Country_of_residence, -total_visitors), y = total_visitors)) +
   geom_bar(stat = "identity") +
   coord_flip() +
@@ -69,13 +69,13 @@ ggplot(country_visitors, aes(x = reorder(Country_of_residence, -total_visitors),
        x = "Country",
        y = "Total Visitors")
 
-# 按月汇总游客数量
+# summarise the number of tourists by months
 monthly_visitors <- visitor_data_clean %>%
   filter(Year >= 2022 & Month >= 5) %>%
   group_by(Year, Month) %>%
   summarize(total_visitors = sum(Count))
 
-# 绘制月度游客数量变化图
+# plot the changes in the number of tourist by month
 ggplot(monthly_visitors, aes(x = interaction(Year, Month), y = total_visitors)) +
   geom_line(group = 1) +
   labs(title = "Monthly Visitor Numbers (May 2022 - June 2024)",
@@ -83,13 +83,13 @@ ggplot(monthly_visitors, aes(x = interaction(Year, Month), y = total_visitors)) 
        y = "Total Visitors") +
   theme(axis.text.x = element_text(angle = 90, hjust = 1))
 
-# 按周汇总游客数量
+# tourist number by week
 weekly_visitors <- visitor_data_clean %>%
   filter(Year >= 2022 & Year <= 2024) %>%
   group_by(Week_ended) %>%
   summarize(total_visitors = sum(Count))
 
-# 绘制周度游客数量变化图
+# plot the changes by week
 ggplot(weekly_visitors, aes(x = Week_ended, y = total_visitors)) +
   geom_line(group = 1) +
   labs(title = "Weekly Visitor Numbers (May 2022 - June 2024)",
@@ -97,12 +97,12 @@ ggplot(weekly_visitors, aes(x = Week_ended, y = total_visitors)) +
        y = "Total Visitors") +
   theme(axis.text.x = element_text(angle = 90, hjust = 1))
 
-# 按国家和特征变量汇总游客数量
+# Summarize the number of tourists by country and characteristic variables (length of stay, purpose)
 visitor_characteristics <- visitor_data_clean %>%
   group_by(Country_of_residence, Length_of_stay, Travel_purpose) %>%
   summarize(total_visitors = sum(Count))
 
-# 绘制不同国家游客的停留时间分布
+# plot the distribution of length of stay by countries
 ggplot(visitor_characteristics, aes(x = Length_of_stay, y = total_visitors, fill = Travel_purpose)) +
   geom_bar(stat = "identity", position = "dodge") +
   facet_wrap(~ Country_of_residence) +
@@ -110,19 +110,19 @@ ggplot(visitor_characteristics, aes(x = Length_of_stay, y = total_visitors, fill
        x = "Length of Stay",
        y = "Total Visitors")
 
-# 按入境港口和国家汇总游客数量
+# summarise by entry port and country
 port_visitors <- visitor_data_clean %>%
   group_by(NZ_port, Country_of_residence) %>%
   summarize(total_visitors = sum(Count))
 
-# 绘制入境港口选择的柱状图(use stack?)
+# bar chart by entry port (better use stack?)
 ggplot(port_visitors, aes(x = NZ_port, y = total_visitors, fill = Country_of_residence)) +
   geom_bar(stat = "identity", position = "dodge") +
   labs(title = "NZ Port Preferences by Country of Residence",
        x = "NZ Port",
        y = "Total Visitors")
 
-# 添加一个时期变量：pre-covid, during-covid, post-covid
+# add a period variable：pre-covid, during-covid, post-covid
 visitor_data_clean <- visitor_data_clean %>%
   mutate(period = case_when(
     Year < 2020 ~ "Pre-COVID",
@@ -130,12 +130,12 @@ visitor_data_clean <- visitor_data_clean %>%
     Year > 2021 ~ "Post-COVID"
   ))
 
-# 分析疫情前、中、后游客数量变化
+# compare the changes in number before during and after Covid (better find 5 years data)
 covid_period_visitors <- visitor_data_clean %>%
   group_by(period, Year) %>%
   summarize(total_visitors = sum(Count))
 
-# 绘制疫情前、中、后的游客数量变化图
+# plotting- changes in number before during and after
 ggplot(covid_period_visitors, aes(x = Year, y = total_visitors, color = period, group = period)) +
   geom_line() +
   geom_point() +
