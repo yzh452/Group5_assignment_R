@@ -29,3 +29,6 @@ https://www.stats.govt.nz/assets/Uploads/Provisional-international-travel-statis
 
 ###
 If we can find a CSV file with previous 5 years data, it might better support our data analysis.
+
+### Dataset from 2003 ~ 2024 June
+https://infoshare.stats.govt.nz/ViewTable.aspx?pxID=eed8a42c-87ec-4883-8a39-20422b7cb2a8
