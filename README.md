@@ -19,7 +19,7 @@ the closest international flight ports?
 
 ### Lecture's additional comment: 
 Since you are doing 5 years, how about do a thorough analytics on pre-in-post covid analysis?
-
+Kai comment: please check the ts.r file under my branch.
 ###
 I've used the record till July 28th that was downloaded earlier. The most up-to-date CSV file (foreign visitors) is available at the following link. Please update the read.csv function when using the new files.
 Please download the CSV file and place it in the same working directory as the project file.
