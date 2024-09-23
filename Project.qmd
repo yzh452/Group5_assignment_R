@@ -30,6 +30,7 @@ workdf <- rbind(df1, df2)
 ```
 
 ```{r}
+#| echo: true
 #Explore the df
 head(workdf)
 ```
@@ -50,23 +51,26 @@ tail(mydf)
 
 ```{r}
 # Create a 'month-year' column
-mydf$Date <- as.Date(paste(mydf$year, mydf$month, "01", sep = "-"), format = "%Y-%m-%d")
+mydf$Date <- as.Date(paste(mydf$year, mydf$month, "01", sep = "-"), 
+                     format = "%Y-%m-%d")
 ```
 
 ```{r}
 library(dplyr)
 
-# Summarize the total monthly movements with .groups = "drop" to avoid grouping warning
+# Summarize the total monthly movements
 monthly_data <- mydf %>%
   group_by(year, month) %>%
-  summarise(Total_Movements = sum(total_movements, na.rm = TRUE), .groups = "drop")
+  summarise(Total_Movements = sum(total_movements, na.rm = TRUE), 
+            .groups = "drop")
 ```
 
 ```{r}
 library(ggplot2)
 
 # Plot total monthly movements over the years
-ggplot(monthly_data, aes(x = as.Date(paste(year, month, "01", sep = "-")), y = Total_Movements)) +
+ggplot(monthly_data, aes(x = as.Date(paste(year, month, "01", sep = "-")), 
+                         y = Total_Movements)) +
   geom_line() +
   scale_x_date(date_labels = "%Y-%m", date_breaks = "1 year") +
   labs(title = "Monthly Movements Over the Years",
