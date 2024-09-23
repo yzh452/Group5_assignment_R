@@ -14,12 +14,63 @@ library(lubridate)
 
 ```
 
-```{r}
-#| echo: false 
-# Load dataset
-visitor_data<-read.csv('VisitorArrivals 28Jul2024.csv')
-```
-
 # Project Goal
 
 bla-bla-bla
+
+```{r}
+# Load datasets
+df1 <- read.csv("2019-21_dailydata.csv")
+df2 <- read.csv("2022_24_dailydata.csv")
+```
+
+```{r}
+# Merge the data
+workdf <- rbind(df1, df2)
+```
+
+```{r}
+#Explore the df
+head(workdf)
+```
+
+```{r}
+str(workdf)
+```
+
+```{r}
+# Remove rows where any column in the row contains "Total"
+mydf <- workdf[!apply(workdf, 1, function(row) any(grepl("Total", row))), ]
+
+```
+
+```{r}
+tail(mydf)
+```
+
+```{r}
+# Create a 'month-year' column
+mydf$Date <- as.Date(paste(mydf$year, mydf$month, "01", sep = "-"), format = "%Y-%m-%d")
+```
+
+```{r}
+library(dplyr)
+
+# Summarize the total monthly movements with .groups = "drop" to avoid grouping warning
+monthly_data <- mydf %>%
+  group_by(year, month) %>%
+  summarise(Total_Movements = sum(total_movements, na.rm = TRUE), .groups = "drop")
+```
+
+```{r}
+library(ggplot2)
+
+# Plot total monthly movements over the years
+ggplot(monthly_data, aes(x = as.Date(paste(year, month, "01", sep = "-")), y = Total_Movements)) +
+  geom_line() +
+  scale_x_date(date_labels = "%Y-%m", date_breaks = "1 year") +
+  labs(title = "Monthly Movements Over the Years",
+       x = "Date",
+       y = "Total Movements") +
+  theme_minimal()
+```
